@@ -28,6 +28,8 @@ func main() {
 
 	cacheManager := cache.New(bigcacheStore)
 
+	// TODO fix to prevent man in the middle
+	// This hack is needed to get the docker image working, cosider making a docker image with openssl to fix
 	customTransport := http.DefaultTransport.(*http.Transport).Clone()
 	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
 	httpClient = http.Client{Transport: customTransport}
