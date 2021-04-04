@@ -1,6 +1,7 @@
 package main
 
 import (
+	"crypto/tls"
 	"fmt"
 	"net/http"
 	"time"
@@ -17,6 +18,7 @@ type Query struct {
 }
 
 var cacheManager cache.Cache
+var httpClient http.Client
 
 func main() {
 	r := gin.Default()
@@ -25,6 +27,10 @@ func main() {
 	bigcacheStore := store.NewBigcache(bigcacheClient, nil) // No otions provided (as second argument)
 
 	cacheManager := cache.New(bigcacheStore)
+
+	customTransport := http.DefaultTransport.(*http.Transport).Clone()
+	customTransport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true}
+	httpClient = http.Client{Transport: customTransport}
 
 	r.GET("/open-graph", func(c *gin.Context) {
 		var query Query
@@ -57,7 +63,7 @@ func main() {
 		}
 
 		// TODO validate if response status code is 200
-		resp, err := http.Get(query.Url)
+		resp, err := httpClient.Get(query.Url)
 
 		if err != nil {
 			c.JSON(500, gin.H{
