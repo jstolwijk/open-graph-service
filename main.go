@@ -21,7 +21,7 @@ var cacheManager cache.Cache
 func main() {
 	r := gin.Default()
 
-	bigcacheClient, _ := bigcache.NewBigCache(bigcache.DefaultConfig(5 * time.Minute))
+	bigcacheClient, _ := bigcache.NewBigCache(bigcache.DefaultConfig(4 * time.Hour))
 	bigcacheStore := store.NewBigcache(bigcacheClient, nil) // No otions provided (as second argument)
 
 	cacheManager := cache.New(bigcacheStore)
@@ -56,6 +56,7 @@ func main() {
 			return
 		}
 
+		// TODO validate if response status code is 200
 		resp, err := http.Get(query.Url)
 
 		if err != nil {
